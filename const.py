@@ -7,7 +7,7 @@ from logging import Logger, getLogger
 LOGGER: Logger = getLogger(__package__)
 
 NAME = "Ambientika"
-DOMAIN = "ambientika"
+DOMAIN = "ambientika_dev"
 VERSION = "1.0.0"
 
 DEFAULT_HOST = "https://app.ambientika.eu:4521"  # This is the default from ambientika_py. I am not aware of other values yet.

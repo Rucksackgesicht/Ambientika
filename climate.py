@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ambientika_py import Device, DeviceStatus, FanSpeed, HumidityLevel, OperatingMode
+from ambientika_py import Device, DeviceStatus, FanSpeed, HumidityLevel, OperatingMode, LightSensorLevel
 
 from homeassistant.components.climate import ClimateEntity
 from homeassistant.components.climate.const import (
@@ -259,6 +259,7 @@ class AmbientikaClimate(ClimateEntity):
         fan_mode: str | None = None,
         operation_mode: str | None = None,
         humidity: int | None = None,
+        light_sensor_level: int | None = None,
     ) -> None:
         """Make changes to the device."""
         if not self._status:
@@ -287,19 +288,28 @@ class AmbientikaClimate(ClimateEntity):
                 target_humidity = self._status["humidity_level"]
             else:
                 target_humidity = HumidityLevel.Normal
+        if light_sensor_level:
+            target_light_sensor_level = LightSensorLevel[light_sensor_level]
+        else:
+            if self._status["light_sensor_level"]:
+                target_light_sensor_level = self._status["light_sensor_level"]
+            else:
+                target_light_sensor_level = LightSensorLevel.Off
 
         LOGGER.debug(
-            "Writing to device %s: mode %s, fan speed %s, humidity_level %s",
+            "Writing to device %s: mode %s, fan speed %s, humidity_level %s, light_sensor_level %s",
             self._device.serial_number,
             target_mode,
             target_speed,
             target_humidity,
+	    target_light_sensor_level
         )
         status = await self._device.change_mode(
             {
                 "operating_mode": target_mode,
                 "fan_speed": target_speed,
                 "humidity_level": target_humidity,
+		"light_sensor_level": target_light_sensor_level
             }
         )
         match status:
